@@ -11,7 +11,7 @@ import {
   deleteAllCompletedTasks,
   getTasks,
 } from '@/modules/tasks/services/tasks.service';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
 const toast = useToast();
@@ -79,6 +79,18 @@ function priorityBadge(p: TaskPriority) {
   return 'bg-secondary';
 }
 
+const search = ref<string>('');
+
+const filteredTasks = computed(() => {
+  const term = search.value.trim().toLowerCase();
+  if (term === '') return tasks.value;
+  return tasks.value.filter(
+    (task) =>
+      task.name.toLowerCase().includes(term) ||
+      (task.description ?? '').toLowerCase().includes(term),
+  );
+});
+
 onMounted(loadTasks);
 </script>
 
@@ -90,7 +102,22 @@ onMounted(loadTasks);
     </header>
 
     <TaskForm :disabled="loading" @submit="onCreateTask" />
-
+    <div class="d-flex gap-2 mb-3" v-if="!loading && tasks.length">
+      <!-- Buscar -->
+      <input
+        type="text"
+        placeholder="Buscar tareas por nombre o descripción..."
+        class="form-control"
+        v-model="search"
+      />
+      <!-- /Buscar -->
+    </div>
+    <p
+      v-if="!loading && !error && tasks.length > 0 && filteredTasks.length === 0"
+      class="text-muted mb-3"
+    >
+      No hay tareas que coincidan con la búsqueda.
+    </p>
     <div class="d-flex gap-2 mb-3">
       <button
         class="btn btn-sm btn-outline-success"
@@ -125,9 +152,9 @@ onMounted(loadTasks);
       {{ error }}
     </div>
 
-    <div v-if="!loading && tasks.length" class="list-group">
+    <div v-if="!loading && filteredTasks.length" class="list-group">
       <RouterLink
-        v-for="task in tasks"
+        v-for="task in filteredTasks"
         :key="task.id"
         :to="{ name: 'task-detail', params: { id: task.id } }"
         class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -163,6 +190,8 @@ onMounted(loadTasks);
       </RouterLink>
     </div>
 
-    <p v-if="!loading && tasks.length === 0" class="text-muted">No tienes tareas todavía.</p>
+    <p v-if="!loading && tasks.length === 0 && filteredTasks.length === 0" class="text-muted">
+      No tienes tareas todavía.
+    </p>
   </section>
 </template>
