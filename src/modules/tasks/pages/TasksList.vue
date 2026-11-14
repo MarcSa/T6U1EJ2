@@ -79,6 +79,7 @@ function priorityBadge(p: TaskPriority) {
   return 'bg-secondary';
 }
 
+// exercici T6U1EJ2
 const search = ref<string>('');
 
 const filteredTasks = computed(() => {
@@ -90,6 +91,7 @@ const filteredTasks = computed(() => {
       (task.description ?? '').toLowerCase().includes(term),
   );
 });
+// /exercici T6U1EJ2
 
 onMounted(loadTasks);
 </script>
@@ -110,7 +112,6 @@ onMounted(loadTasks);
         class="form-control"
         v-model="search"
       />
-      <!-- /Buscar -->
     </div>
     <p
       v-if="!loading && !error && tasks.length > 0 && filteredTasks.length === 0"
@@ -118,6 +119,7 @@ onMounted(loadTasks);
     >
       No hay tareas que coincidan con la búsqueda.
     </p>
+    <!-- /Buscar -->
     <div class="d-flex gap-2 mb-3">
       <button
         class="btn btn-sm btn-outline-success"
